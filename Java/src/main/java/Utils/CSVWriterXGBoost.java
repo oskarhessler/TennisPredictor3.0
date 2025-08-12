@@ -1,8 +1,11 @@
 package Utils;
 
 import Objects.MatchFeatures;
+
+import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 
 /**
@@ -15,12 +18,17 @@ public class CSVWriterXGBoost {
 
         try (FileWriter writer = new FileWriter(filePath)) {
 
-            // Write header
+            // Write header (expanded)
             writer.append("player1,player2,surface,round,player1Rank,player2Rank,player1Elo,player2Elo,")
                     .append("h2hWinsP1,h2hWinsP2,h2hWinRateP1,h2hWinRateP2,")
                     .append("formWinsP1,formLossesP1,formWinRateP1,")
                     .append("formWinsP2,formLossesP2,formWinRateP2,")
-                    .append("oddsP1,oddsP2,winner\n");
+                    .append("oddsP1,oddsP2,")
+                    .append("winnerRollingWinPctLast5,winnerRollingAceAvgLast5,winnerRollingDFAvgLast5,winnerRollingBPConversionLast5,")
+                    .append("loserRollingWinPctLast5,loserRollingAceAvgLast5,loserRollingDFAvgLast5,loserRollingBPConversionLast5,")
+                    .append("winnerH2HWinPct,loserH2HWinPct,")
+                    .append("winnerSurfaceWinPct,loserSurfaceWinPct,winnerSurfaceAceRate,loserSurfaceAceRate,")
+                    .append("winner\n");
 
             // Write data
             for (MatchFeatures mf : matches) {
@@ -44,6 +52,20 @@ public class CSVWriterXGBoost {
                         .append(String.valueOf(mf.getFormWinRateP2())).append(",")
                         .append(String.valueOf(mf.getOddsP1())).append(",")
                         .append(String.valueOf(mf.getOddsP2())).append(",")
+                        .append(String.valueOf(mf.getWinnerRollingWinPctLast5())).append(",")
+                        .append(String.valueOf(mf.getWinnerRollingAceAvgLast5())).append(",")
+                        .append(String.valueOf(mf.getWinnerRollingDFAvgLast5())).append(",")
+                        .append(String.valueOf(mf.getWinnerRollingBPConversionLast5())).append(",")
+                        .append(String.valueOf(mf.getLoserRollingWinPctLast5())).append(",")
+                        .append(String.valueOf(mf.getLoserRollingAceAvgLast5())).append(",")
+                        .append(String.valueOf(mf.getLoserRollingDFAvgLast5())).append(",")
+                        .append(String.valueOf(mf.getLoserRollingBPConversionLast5())).append(",")
+                        .append(String.valueOf(mf.getWinnerH2HWinPct())).append(",")
+                        .append(String.valueOf(mf.getLoserH2HWinPct())).append(",")
+                        .append(String.valueOf(mf.getWinnerSurfaceWinPct())).append(",")
+                        .append(String.valueOf(mf.getLoserSurfaceWinPct())).append(",")
+                        .append(String.valueOf(mf.getWinnerSurfaceAceRate())).append(",")
+                        .append(String.valueOf(mf.getLoserSurfaceAceRate())).append(",")
                         .append(String.valueOf(mf.getWinner()))
                         .append("\n");
             }
@@ -60,4 +82,15 @@ public class CSVWriterXGBoost {
         if (value == null) return "";
         return "\"" + value.replace("\"", "\"\"") + "\"";
     }
+
+    public static void writeFeaturesToCSV(List<MatchFeatures> featuresList, String outputPath) throws IOException {
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(outputPath));
+             CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(MatchFeatures.csvHeader()))) {
+
+            for (MatchFeatures features : featuresList) {
+                csvPrinter.printRecord(features.toCSVRecord());
+            }
+        }
+    }
+
 }

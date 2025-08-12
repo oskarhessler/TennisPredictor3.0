@@ -1,5 +1,8 @@
 package Objects;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Represents all engineered match features for XGBoost preparation.
  */
@@ -162,4 +165,30 @@ public class MatchFeatures {
     public double getWinnerSurfaceAceRate() { return winnerSurfaceAceRate; }
     public double getLoserSurfaceAceRate() { return loserSurfaceAceRate; }
     public int getWinner() { return winner; }
+
+    public static String[] csvHeader() {
+        return new String[]{
+                "winner_name", "loser_name",
+                "winner_elo", "loser_elo",
+                "winner_rank", "loser_rank",
+                "winner_surface_winrate", "loser_surface_winrate",
+                "winner_form_last5", "loser_form_last5",
+                "h2h_winrate_winner", "h2h_winrate_loser",
+                "label"
+        };
+    }
+
+    public List<Object> toCSVRecord() {
+        return Arrays.asList(
+                getPlayer1(), getPlayer2(),                              // winner_name, loser_name
+                getPlayer1Elo(), getPlayer2Elo(),                        // winner_elo, loser_elo
+                getPlayer1Rank(), getPlayer2Rank(),                      // winner_rank, loser_rank
+                getWinnerSurfaceWinPct(), getLoserSurfaceWinPct(),       // winner_surface_winrate, loser_surface_winrate
+                getFormWinRateP1(), getFormWinRateP2(),                   // winner_form_last5, loser_form_last5
+                getWinnerH2HWinPct(), getLoserH2HWinPct(),               // h2h_winrate_winner, h2h_winrate_loser
+                getWinner()                                              // label
+        );
+    }
+
+
 }
